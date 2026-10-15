@@ -2,3 +2,5 @@
 .build-cache/
 *.app/
 rendered-*.png
+streamdeck-plugin/node_modules/
+streamdeck-plugin/*.streamDeckPlugin

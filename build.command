@@ -22,9 +22,13 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
 <key>CFBundleIdentifier</key><string>com.local.jewishmusicstream.menubar</string>
 <key>CFBundleExecutable</key><string>JewishMusicMenuBar</string>
 <key>CFBundleIconFile</key><string>AppIcon</string>
+<key>CFBundleURLTypes</key><array><dict>
+<key>CFBundleURLName</key><string>com.local.jewishmusicstream.menubar</string>
+<key>CFBundleURLSchemes</key><array><string>jewishmusicstream</string></array>
+</dict></array>
 <key>CFBundlePackageType</key><string>APPL</string>
-<key>CFBundleShortVersionString</key><string>0.1.5</string>
-<key>CFBundleVersion</key><string>6</string>
+<key>CFBundleShortVersionString</key><string>0.2.0</string>
+<key>CFBundleVersion</key><string>7</string>
 <key>LSUIElement</key><true/>
 <key>NSHighResolutionCapable</key><true/>
 <key>NSAppTransportSecurity</key><dict><key>NSAllowsArbitraryLoadsForMedia</key><true/></dict>
@@ -37,7 +41,7 @@ if ! SDKROOT="$SDK_PATH" \
     -target arm64-apple-macos14.0 \
     -module-cache-path "$CACHE_DIR/swift" \
     -sdk "$SDK_PATH" \
-    -framework SwiftUI -framework AppKit -framework AVFoundation -framework ServiceManagement \
+    -framework SwiftUI -framework AppKit -framework AVFoundation -framework ServiceManagement -framework Carbon \
     JewishMusicMenuBar.swift -o "$APP/Contents/MacOS/JewishMusicMenuBar"; then
   echo
   echo 'Build failed. If the message says the SDK is not supported by the compiler,'

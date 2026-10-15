@@ -2,9 +2,33 @@ import SwiftUI
 import AVFoundation
 import AppKit
 import ServiceManagement
+import Carbon
 
 private let streamURL = URL(string: "https://stream.jewishmusicstream.com:8000/stream")!
 private let trackURL = URL(string: "https://jewishmusicstream.com/system/web/currenttrack.html")!
+
+private extension Notification.Name {
+    static let toggleRadioPlayback = Notification.Name("JewishMusicStream.togglePlayback")
+}
+
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        NSAppleEventManager.shared().setEventHandler(
+            self,
+            andSelector: #selector(handleURL(_:withReplyEvent:)),
+            forEventClass: AEEventClass(kInternetEventClass),
+            andEventID: AEEventID(kAEGetURL)
+        )
+    }
+
+    @objc private func handleURL(_ event: NSAppleEventDescriptor, withReplyEvent replyEvent: NSAppleEventDescriptor) {
+        guard let value = event.paramDescriptor(forKeyword: AEKeyword(keyDirectObject))?.stringValue,
+              let url = URL(string: value),
+              url.scheme == "jewishmusicstream",
+              url.host == "toggle" else { return }
+        NotificationCenter.default.post(name: .toggleRadioPlayback, object: nil)
+    }
+}
 
 private enum Branding {
     static let logo: NSImage? = {
@@ -42,6 +66,7 @@ final class RadioModel: ObservableObject {
     private var timer: Timer?
     private var currentKey = ""
     private var artworkTask: Task<Void, Never>?
+    private var toggleObserver: NSObjectProtocol?
 
     init() {
         player.volume = Float(volume)
@@ -50,6 +75,9 @@ final class RadioModel: ObservableObject {
         }
         timer = Timer.scheduledTimer(withTimeInterval: 12, repeats: true) { [weak self] _ in
             Task { @MainActor in await self?.refreshTrack() }
+        }
+        toggleObserver = NotificationCenter.default.addObserver(forName: .toggleRadioPlayback, object: nil, queue: .main) { [weak self] _ in
+            Task { @MainActor in self?.togglePlayback() }
         }
         startPlayback()
         Task { await refreshTrack() }
@@ -266,6 +294,7 @@ struct PlayerPopover: View {
 
 @main
 struct JewishMusicMenuBarApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var radio = RadioModel()
     var body: some Scene {
         MenuBarExtra {

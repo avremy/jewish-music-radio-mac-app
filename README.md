@@ -13,6 +13,19 @@ The popover includes the official JewishMusic Stream logo. Its circular broadcas
 
 The script compiles the Swift source into `JewishMusic Stream.app` in the same folder, ad-hoc signs it, and opens it. You can move the app to `/Applications` after building. The app uses no third-party dependencies.
 
+## Stream Deck plugin
+
+The `streamdeck-plugin` folder contains an Elgato Stream Deck 6.5+ plugin for macOS. Its single **Play / Pause** action:
+
+- launches JewishMusic Stream and starts playback when the app is closed;
+- toggles play/pause on later presses;
+- refreshes the current album artwork on the key every 12 seconds;
+- overlays the current play or pause control on the artwork.
+
+For the most reliable launch behavior, move `JewishMusic Stream.app` to `/Applications` and open it once before using the Stream Deck action. Install the packaged `JewishMusicStream.streamDeckPlugin`, then drag **JewishMusic Stream → Play / Pause** onto a key.
+
+To build the plugin from source, open `streamdeck-plugin`, run `npm install`, then run `npm run build`, `npm run validate`, and `npm run pack`.
+
 ## Current limitations
 
 - A future redesign of the station's metadata page could require a parser update.

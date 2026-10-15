@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+  "Name": "JewishMusic Stream",
+  "Version": "1.0.0.0",
+  "Author": "Avremy",
+  "URL": "https://github.com/avremy/jewish-music-radio-mac-app",
+  "Actions": [
+    {
+      "Name": "Play / Pause",
+      "UUID": "com.avremy.jewishmusicstream.toggle",
+      "Icon": "imgs/action-icon",
+      "Tooltip": "Launch or play/pause JewishMusic Stream",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableCaching": true,
+      "States": [
+        {
+          "Image": "imgs/key",
+          "TitleAlignment": "bottom"
+        }
+      ]
+    }
+  ],
+  "Category": "JewishMusic Stream",
+  "CategoryIcon": "imgs/category-icon",
+  "CodePath": "bin/plugin.js",
+  "Description": "Launches and controls the JewishMusic Stream macOS menu-bar player and shows the current album artwork on the key.",
+  "Icon": "imgs/plugin-icon",
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "6.5"
+  },
+  "OS": [
+    {
+      "Platform": "mac",
+      "MinimumVersion": "14"
+    }
+  ],
+  "Nodejs": {
+    "Version": "20"
+  },
+  "ApplicationsToMonitor": {
+    "mac": [
+      "com.local.jewishmusicstream.menubar"
+    ]
+  },
+  "UUID": "com.avremy.jewishmusicstream"
+}
