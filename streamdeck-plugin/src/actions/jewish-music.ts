@@ -98,12 +98,12 @@ export class JewishMusicAction extends SingletonAction {
   private async updateKey(key: KeyAction): Promise<void> {
     if (!this.artworkDataURL) {
       await key.setImage();
+      await key.setTitle(this.isPlaying ? "❚❚" : "▶");
       return;
     }
-    const control = this.isPlaying
-      ? `<rect x="61" y="116" width="7" height="19" rx="2" fill="white"/><rect x="76" y="116" width="7" height="19" rx="2" fill="white"/>`
-      : `<path d="M65 115 L84 125.5 L65 136 Z" fill="white"/>`;
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144"><image href="${this.artworkDataURL}" width="144" height="144" preserveAspectRatio="xMidYMid slice"/><rect y="108" width="144" height="36" fill="rgba(0,0,0,.58)"/>${control}</svg>`;
-    await key.setImage(svg);
+    // Stream Deck supports data URLs directly. Avoid nesting the artwork in an
+    // SVG because its renderer does not reliably resolve embedded data images.
+    await key.setImage(this.artworkDataURL);
+    await key.setTitle(this.isPlaying ? "❚❚" : "▶");
   }
 }
