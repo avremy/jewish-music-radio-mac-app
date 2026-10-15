@@ -1,6 +1,7 @@
 import streamDeck, {
   action,
   KeyAction,
+  KeyDownEvent,
   KeyUpEvent,
   SingletonAction,
   WillAppearEvent,
@@ -20,6 +21,11 @@ export class JewishMusicAction extends SingletonAction {
   private timer: NodeJS.Timeout | undefined;
   private artworkDataURL: string | undefined;
   private isPlaying = false;
+  private pressedAt = new Map<string, number>();
+
+  override onKeyDown(ev: KeyDownEvent): void {
+    if (ev.action.isKey()) this.pressedAt.set(ev.action.id, Date.now());
+  }
 
   override async onWillAppear(ev: WillAppearEvent): Promise<void> {
     if (!ev.action.isKey()) return;
@@ -41,10 +47,13 @@ export class JewishMusicAction extends SingletonAction {
 
   override async onKeyUp(ev: KeyUpEvent): Promise<void> {
     if (!ev.action.isKey()) return;
+    const pressedAt = this.pressedAt.get(ev.action.id) ?? Date.now();
+    this.pressedAt.delete(ev.action.id);
+    const isLongPress = Date.now() - pressedAt >= 700;
     try {
       if (await this.isAppRunning()) {
-        await execFileAsync("/usr/bin/open", ["jewishmusicstream://toggle"]);
-        this.isPlaying = !this.isPlaying;
+        await execFileAsync("/usr/bin/open", [isLongPress ? "jewishmusicstream://live" : "jewishmusicstream://toggle"]);
+        this.isPlaying = isLongPress ? true : !this.isPlaying;
       } else {
         await execFileAsync("/usr/bin/open", ["-b", APP_BUNDLE_ID]);
         this.isPlaying = true;

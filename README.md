@@ -1,6 +1,8 @@
-# JewishMusic Stream — macOS menu-bar player (prototype v0.1)
+# JewishMusic Stream — macOS menu-bar player (v0.3)
 
 Native Apple Silicon menu-bar app, with no Dock icon. It starts playing the live MP3 radio stream automatically when opened and polls the station's current-track page every 12 seconds for song metadata. It reads the station's title, artist, and artwork directly, then uses Apple's iTunes artwork catalog only as a fallback. **Artwork is best effort**, and may not be available for every track.
+
+If playback was paused, click **Go Live** to discard the buffered paused position and reconnect at the station's current live point.
 
 The popover includes the official JewishMusic Stream logo. Its circular broadcast emblem is used in the menu bar until album artwork is available, and the official JewishMusic Stream mobile artwork is packaged as the macOS application icon.
 
@@ -19,6 +21,7 @@ The `streamdeck-plugin` folder contains an Elgato Stream Deck 6.5+ plugin for ma
 
 - launches JewishMusic Stream and starts playback when the app is closed;
 - toggles play/pause on later presses;
+- returns to the current live point when the key is held for about 0.7 seconds;
 - refreshes the current album artwork on the key every 12 seconds;
 - overlays the current play or pause control on the artwork.
 

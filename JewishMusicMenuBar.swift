@@ -9,6 +9,7 @@ private let trackURL = URL(string: "https://jewishmusicstream.com/system/web/cur
 
 private extension Notification.Name {
     static let toggleRadioPlayback = Notification.Name("JewishMusicStream.togglePlayback")
+    static let goLive = Notification.Name("JewishMusicStream.goLive")
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -24,9 +25,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func handleURL(_ event: NSAppleEventDescriptor, withReplyEvent replyEvent: NSAppleEventDescriptor) {
         guard let value = event.paramDescriptor(forKeyword: AEKeyword(keyDirectObject))?.stringValue,
               let url = URL(string: value),
-              url.scheme == "jewishmusicstream",
-              url.host == "toggle" else { return }
-        NotificationCenter.default.post(name: .toggleRadioPlayback, object: nil)
+              url.scheme == "jewishmusicstream" else { return }
+        switch url.host {
+        case "toggle": NotificationCenter.default.post(name: .toggleRadioPlayback, object: nil)
+        case "live": NotificationCenter.default.post(name: .goLive, object: nil)
+        default: break
+        }
     }
 }
 
@@ -67,6 +71,7 @@ final class RadioModel: ObservableObject {
     private var currentKey = ""
     private var artworkTask: Task<Void, Never>?
     private var toggleObserver: NSObjectProtocol?
+    private var goLiveObserver: NSObjectProtocol?
 
     init() {
         player.volume = Float(volume)
@@ -78,6 +83,9 @@ final class RadioModel: ObservableObject {
         }
         toggleObserver = NotificationCenter.default.addObserver(forName: .toggleRadioPlayback, object: nil, queue: .main) { [weak self] _ in
             Task { @MainActor in self?.togglePlayback() }
+        }
+        goLiveObserver = NotificationCenter.default.addObserver(forName: .goLive, object: nil, queue: .main) { [weak self] _ in
+            Task { @MainActor in self?.goLive() }
         }
         startPlayback()
         Task { await refreshTrack() }
@@ -97,6 +105,15 @@ final class RadioModel: ObservableObject {
         if player.currentItem == nil {
             player.replaceCurrentItem(with: AVPlayerItem(url: streamURL))
         }
+        player.play()
+        isPlaying = true
+        status = "Live"
+    }
+
+    func goLive() {
+        // Replacing the streaming item drops AVPlayer's buffered, paused position
+        // and reconnects at the station's current live edge.
+        player.replaceCurrentItem(with: AVPlayerItem(url: streamURL))
         player.play()
         isPlaying = true
         status = "Live"
@@ -263,10 +280,18 @@ struct PlayerPopover: View {
             .frame(width: 220, height: 220).clipShape(RoundedRectangle(cornerRadius: 14))
             Text(radio.title).font(.title3.bold()).lineLimit(2).multilineTextAlignment(.center)
             Text(radio.artist).font(.subheadline).foregroundStyle(.secondary).lineLimit(2)
-            Button(action: radio.togglePlayback) {
-                Image(systemName: radio.isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                    .font(.system(size: 44))
-            }.buttonStyle(.plain).accessibilityLabel(radio.isPlaying ? "Pause" : "Play")
+            HStack(spacing: 18) {
+                Button(action: radio.togglePlayback) {
+                    Image(systemName: radio.isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                        .font(.system(size: 44))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(radio.isPlaying ? "Pause" : "Play")
+                Button(action: radio.goLive) {
+                    Label("Go Live", systemImage: "dot.radiowaves.left.and.right")
+                }
+                .help("Reconnect at the current live point")
+            }
             HStack {
                 Image(systemName: "speaker.fill")
                 Slider(value: $radio.volume, in: 0...1)
