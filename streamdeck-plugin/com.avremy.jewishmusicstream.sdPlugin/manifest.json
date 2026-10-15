@@ -1,7 +1,7 @@
 {
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
   "Name": "JewishMusic Stream",
-  "Version": "1.0.1.0",
+  "Version": "1.0.2.0",
   "Author": "Avremy",
   "URL": "https://github.com/avremy/jewish-music-radio-mac-app",
   "Actions": [
