@@ -51,6 +51,7 @@ final class RadioModel: ObservableObject {
         timer = Timer.scheduledTimer(withTimeInterval: 12, repeats: true) { [weak self] _ in
             Task { @MainActor in await self?.refreshTrack() }
         }
+        startPlayback()
         Task { await refreshTrack() }
     }
 
@@ -60,13 +61,17 @@ final class RadioModel: ObservableObject {
             isPlaying = false
             status = "Paused"
         } else {
-            if player.currentItem == nil {
-                player.replaceCurrentItem(with: AVPlayerItem(url: streamURL))
-            }
-            player.play()
-            isPlaying = true
-            status = "Live"
+            startPlayback()
         }
+    }
+
+    private func startPlayback() {
+        if player.currentItem == nil {
+            player.replaceCurrentItem(with: AVPlayerItem(url: streamURL))
+        }
+        player.play()
+        isPlaying = true
+        status = "Live"
     }
 
     func setLaunchAtLogin(_ enabled: Bool) {

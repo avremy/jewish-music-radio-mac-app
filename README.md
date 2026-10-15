@@ -1,6 +1,6 @@
 # JewishMusic Stream — macOS menu-bar player (prototype v0.1)
 
-Native Apple Silicon menu-bar app, with no Dock icon. Plays the live MP3 radio stream and polls the station's current-track page every 12 seconds for song metadata. It reads the station's title, artist, and artwork directly, then uses Apple's iTunes artwork catalog only as a fallback. **Artwork is best effort**, and may not be available for every track.
+Native Apple Silicon menu-bar app, with no Dock icon. It starts playing the live MP3 radio stream automatically when opened and polls the station's current-track page every 12 seconds for song metadata. It reads the station's title, artist, and artwork directly, then uses Apple's iTunes artwork catalog only as a fallback. **Artwork is best effort**, and may not be available for every track.
 
 The popover includes the official JewishMusic Stream logo. Its circular broadcast emblem is used in the menu bar until album artwork is available, and the official JewishMusic Stream mobile artwork is packaged as the macOS application icon.
 
